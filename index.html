@@ -3,60 +3,398 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>add() demo</title>
+  <title>AI CI/CD Demo · add() Playground</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 2rem;
-      line-height: 1.5;
+    :root {
+      --bg: #0b1020;
+      --panel: rgba(255, 255, 255, 0.08);
+      --panel-2: rgba(255, 255, 255, 0.06);
+      --border: rgba(255, 255, 255, 0.12);
+      --text: rgba(255, 255, 255, 0.92);
+      --muted: rgba(255, 255, 255, 0.68);
+      --accent: #7c5cff;
+      --accent-2: #19d3ff;
+      --good: #1dd1a1;
+      --bad: #ff6b6b;
+      --shadow: 0 16px 50px rgba(0, 0, 0, 0.35);
     }
+    [data-theme="light"] {
+      --bg: #f6f7fb;
+      --panel: rgba(255, 255, 255, 0.85);
+      --panel-2: rgba(255, 255, 255, 0.7);
+      --border: rgba(20, 20, 20, 0.10);
+      --text: rgba(10, 10, 10, 0.92);
+      --muted: rgba(10, 10, 10, 0.62);
+      --accent: #5b5cff;
+      --accent-2: #00bcd4;
+      --good: #0b8f6a;
+      --bad: #c0392b;
+      --shadow: 0 14px 40px rgba(0, 0, 0, 0.12);
+    }
+    body {
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      margin: 0;
+      line-height: 1.5;
+      color: var(--text);
+      background:
+        radial-gradient(1200px 600px at 20% 0%, rgba(124, 92, 255, 0.35), transparent 55%),
+        radial-gradient(900px 500px at 80% 20%, rgba(25, 211, 255, 0.28), transparent 60%),
+        radial-gradient(900px 600px at 60% 110%, rgba(29, 209, 161, 0.18), transparent 60%),
+        var(--bg);
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 28px 16px 48px;
+    }
+    .app {
+      width: min(980px, 100%);
+    }
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .logo {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      background:
+        linear-gradient(135deg, rgba(124, 92, 255, 0.95), rgba(25, 211, 255, 0.75));
+      box-shadow: 0 10px 25px rgba(124, 92, 255, 0.25);
+      position: relative;
+      overflow: hidden;
+    }
+    .logo::after {
+      content: "";
+      position: absolute;
+      inset: -30%;
+      background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.50), transparent 55%);
+      transform: rotate(18deg);
+    }
+    h1 {
+      font-size: 18px;
+      margin: 0;
+      letter-spacing: 0.2px;
+    }
+    .subtitle {
+      margin: 2px 0 0;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .pill {
+      border: 1px solid var(--border);
+      background: var(--panel);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 9px 12px;
+      font-size: 13px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      user-select: none;
+    }
+    .pill strong { font-weight: 700; }
+    .toggle {
+      appearance: none;
+      width: 44px;
+      height: 26px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid var(--border);
+      position: relative;
+      cursor: pointer;
+      box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.06);
+    }
+    .toggle::after {
+      content: "";
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 20px;
+      height: 20px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.55));
+      transition: transform 160ms ease;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+    }
+    [data-theme="light"] .toggle {
+      background: rgba(20, 20, 20, 0.06);
+    }
+    .toggle:checked {
+      background: rgba(124, 92, 255, 0.35);
+    }
+    .toggle:checked::after {
+      transform: translateX(18px);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+    @media (min-width: 860px) {
+      .grid {
+        grid-template-columns: 1.05fr 0.95fr;
+        align-items: start;
+      }
+    }
+
     .card {
-      max-width: 400px;
-      padding: 1.5rem;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+      border: 1px solid var(--border);
+      background: var(--panel);
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
+    }
+    .card h2 {
+      margin: 0 0 6px;
+      font-size: 15px;
+      letter-spacing: 0.2px;
+    }
+    .card p {
+      margin: 0 0 12px;
+      font-size: 13px;
+      color: var(--muted);
     }
     label {
       display: block;
       margin-top: 0.75rem;
       font-weight: 600;
+      font-size: 13px;
     }
     input {
       width: 100%;
-      padding: 0.5rem;
+      padding: 10px 12px;
       margin-top: 0.25rem;
       box-sizing: border-box;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--panel-2);
+      color: var(--text);
+      outline: none;
+    }
+    input:focus {
+      border-color: rgba(124, 92, 255, 0.55);
+      box-shadow: 0 0 0 4px rgba(124, 92, 255, 0.18);
+    }
+    select {
+      width: 100%;
+      padding: 10px 12px;
+      margin-top: 0.25rem;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--panel-2);
+      color: var(--text);
+      outline: none;
+      appearance: none;
     }
     button {
-      margin-top: 1rem;
-      padding: 0.5rem 1rem;
-      font-size: 1rem;
+      margin-top: 12px;
+      padding: 10px 12px;
+      font-size: 14px;
       cursor: pointer;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      color: white;
+      background: linear-gradient(135deg, rgba(124, 92, 255, 0.95), rgba(25, 211, 255, 0.75));
+      box-shadow: 0 14px 30px rgba(124, 92, 255, 0.22);
+      width: 100%;
+    }
+    button.secondary {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+      box-shadow: none;
+    }
+    button:active {
+      transform: translateY(1px);
     }
     #result {
-      margin-top: 1rem;
+      margin-top: 12px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(29, 209, 161, 0.10);
       font-weight: 700;
-      color: #0a5;
+      color: var(--good);
+    }
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .small {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 8px;
+    }
+    .kbd {
+      display: inline-flex;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 8px;
+      padding: 1px 6px;
+      font-size: 12px;
+      margin: 0 2px;
+    }
+    .history {
+      margin-top: 12px;
+      border-top: 1px solid var(--border);
+      padding-top: 12px;
+    }
+    .history h3 {
+      margin: 0 0 8px;
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 700;
+      letter-spacing: 0.2px;
+    }
+    .historyList {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: 8px;
+    }
+    .historyItem {
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 12px;
+      padding: 10px 12px;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 13px;
+      align-items: baseline;
+    }
+    .historyItem code {
+      color: var(--text);
+    }
+    .badge {
+      font-size: 12px;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 2px 8px;
+      white-space: nowrap;
+    }
+    .error {
+      margin-top: 12px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 107, 107, 0.35);
+      background: rgba(255, 107, 107, 0.10);
+      color: var(--bad);
+      font-weight: 700;
     }
   </style>
 </head>
 <body>
-  <div class="card">
-    <h1>add() demo (multiplication)</h1>
-    <p>This page mimics the current <code>add(a, b)</code> logic, which returns the product of two numbers.</p>
-    <label for="a">First number</label>
-    <input id="a" name="a" type="number" value="2">
+  <div class="app">
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <h1>AI CI/CD Demo · add() Playground</h1>
+          <div class="subtitle">A simple page deployed via GitHub Pages after CI passes.</div>
+        </div>
+      </div>
+      <div class="actions">
+        <div class="pill" title="Current core behavior">
+          <span>core <strong>add(a,b)</strong> =</span>
+          <span class="badge">multiply</span>
+        </div>
+        <div class="pill" title="Toggle theme">
+          <span>Theme</span>
+          <input id="themeToggle" class="toggle" type="checkbox" role="switch" aria-label="Toggle theme">
+        </div>
+      </div>
+    </div>
 
-    <label for="b">Second number</label>
-    <input id="b" name="b" type="number" value="3">
+    <div class="grid">
+      <section class="card" aria-labelledby="coreDemoTitle">
+        <h2 id="coreDemoTitle">Core behavior demo</h2>
+        <p>
+          This section mimics the current repo logic: <code>add(a, b)</code> returns <strong>a × b</strong>.
+          Try changing values and press <span class="kbd">Enter</span>.
+        </p>
 
-    <button type="button" onclick="handleCalculate()">Calculate</button>
+        <div class="row">
+          <div>
+            <label for="a">A</label>
+            <input id="a" name="a" type="number" value="2" inputmode="decimal" step="any">
+          </div>
+          <div>
+            <label for="b">B</label>
+            <input id="b" name="b" type="number" value="3" inputmode="decimal" step="any">
+          </div>
+        </div>
 
-    <div id="result" aria-live="polite"></div>
+        <button id="btnCore" type="button">Run core add()</button>
+        <div id="result" aria-live="polite"></div>
+        <div id="coreError" class="error" style="display:none" aria-live="polite"></div>
+        <div class="small">
+          Tip: you can also press <span class="kbd">Enter</span> to run, and <span class="kbd">Esc</span> to clear.
+        </div>
+      </section>
+
+      <section class="card" aria-labelledby="toolTitle">
+        <h2 id="toolTitle">Extra tool (not tied to core)</h2>
+        <p>
+          For a richer UI, here’s a small calculator with operator selection and a history panel.
+          This is just a frontend utility; it won’t affect your Python logic.
+        </p>
+
+        <label for="op">Operation</label>
+        <select id="op" name="op">
+          <option value="add">Add (A + B)</option>
+          <option value="sub">Subtract (A − B)</option>
+          <option value="mul">Multiply (A × B)</option>
+          <option value="div">Divide (A ÷ B)</option>
+        </select>
+
+        <div class="row">
+          <div>
+            <label for="x">A</label>
+            <input id="x" name="x" type="number" value="10" inputmode="decimal" step="any">
+          </div>
+          <div>
+            <label for="y">B</label>
+            <input id="y" name="y" type="number" value="5" inputmode="decimal" step="any">
+          </div>
+        </div>
+
+        <button id="btnCalc" type="button">Calculate</button>
+        <button id="btnClear" class="secondary" type="button">Clear history</button>
+        <div id="calcError" class="error" style="display:none" aria-live="polite"></div>
+
+        <div class="history">
+          <h3>History</h3>
+          <ul id="historyList" class="historyList" aria-label="Calculation history"></ul>
+        </div>
+      </section>
+    </div>
   </div>
 
   <script>
+    // ---- Core logic mimic (matches current repo behavior) ----
     function add(a, b) {
       const x = Number(a);
       const y = Number(b);
@@ -66,15 +404,137 @@
       return x * y;
     }
 
-    function handleCalculate() {
-      const a = document.getElementById('a').value;
-      const b = document.getElementById('b').value;
-      const result = add(a, b);
-      const container = document.getElementById('result');
-      container.textContent = Number.isNaN(result)
-        ? 'Please enter valid numbers.'
-        : `Result: ${result}`;
+    function setVisible(el, visible) {
+      el.style.display = visible ? "" : "none";
     }
+
+    function runCore() {
+      const a = document.getElementById("a").value;
+      const b = document.getElementById("b").value;
+      const result = add(a, b);
+      const container = document.getElementById("result");
+      const err = document.getElementById("coreError");
+
+      if (Number.isNaN(result)) {
+        setVisible(err, true);
+        err.textContent = "Please enter valid numbers for A and B.";
+        container.textContent = "";
+        return;
+      }
+      setVisible(err, false);
+      container.textContent = `Result: ${result}`;
+    }
+
+    // ---- Extra calculator tool ----
+    function symbol(op) {
+      return { add: "+", sub: "−", mul: "×", div: "÷" }[op] ?? "?";
+    }
+
+    function calc(op, a, b) {
+      if (op === "add") return a + b;
+      if (op === "sub") return a - b;
+      if (op === "mul") return a * b;
+      if (op === "div") return a / b;
+      return NaN;
+    }
+
+    function formatNumber(n) {
+      if (!Number.isFinite(n)) return String(n);
+      // keep it readable (avoid huge floats)
+      const s = n.toString();
+      if (s.includes("e")) return n.toPrecision(10);
+      return s.length > 14 ? n.toPrecision(12) : s;
+    }
+
+    function addHistoryItem(expression, value) {
+      const list = document.getElementById("historyList");
+      const item = document.createElement("li");
+      item.className = "historyItem";
+
+      const left = document.createElement("span");
+      left.innerHTML = `<code>${expression}</code>`;
+
+      const right = document.createElement("span");
+      right.className = "badge";
+      right.textContent = formatNumber(value);
+
+      item.appendChild(left);
+      item.appendChild(right);
+
+      list.prepend(item);
+
+      // keep last 8
+      while (list.children.length > 8) list.removeChild(list.lastChild);
+    }
+
+    function runCalc() {
+      const op = document.getElementById("op").value;
+      const a = Number(document.getElementById("x").value);
+      const b = Number(document.getElementById("y").value);
+      const err = document.getElementById("calcError");
+
+      if (Number.isNaN(a) || Number.isNaN(b)) {
+        setVisible(err, true);
+        err.textContent = "Please enter valid numbers for A and B.";
+        return;
+      }
+      if (op === "div" && b === 0) {
+        setVisible(err, true);
+        err.textContent = "Division by zero is not allowed.";
+        return;
+      }
+
+      setVisible(err, false);
+      const value = calc(op, a, b);
+      const expr = `${formatNumber(a)} ${symbol(op)} ${formatNumber(b)} =`;
+      addHistoryItem(expr, value);
+    }
+
+    function clearHistory() {
+      document.getElementById("historyList").innerHTML = "";
+      setVisible(document.getElementById("calcError"), false);
+    }
+
+    // ---- Theme ----
+    function applyTheme(theme) {
+      document.documentElement.setAttribute("data-theme", theme);
+      try { localStorage.setItem("theme", theme); } catch (_) {}
+    }
+
+    function initTheme() {
+      let theme = "dark";
+      try {
+        theme = localStorage.getItem("theme") || theme;
+      } catch (_) {}
+      const isLight = theme === "light";
+      document.getElementById("themeToggle").checked = isLight;
+      applyTheme(isLight ? "light" : "dark");
+    }
+
+    // ---- Wire up events ----
+    document.getElementById("btnCore").addEventListener("click", runCore);
+    document.getElementById("btnCalc").addEventListener("click", runCalc);
+    document.getElementById("btnClear").addEventListener("click", clearHistory);
+
+    document.getElementById("themeToggle").addEventListener("change", (e) => {
+      applyTheme(e.target.checked ? "light" : "dark");
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        // run the core demo by default; shift+enter runs calculator
+        if (e.shiftKey) runCalc();
+        else runCore();
+      }
+      if (e.key === "Escape") {
+        document.getElementById("result").textContent = "";
+        setVisible(document.getElementById("coreError"), false);
+        setVisible(document.getElementById("calcError"), false);
+      }
+    });
+
+    initTheme();
+    runCore();
   </script>
 </body>
 </html>
