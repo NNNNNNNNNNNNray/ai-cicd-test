@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-Hant">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI CI/CD Demo · add() Playground</title>
+  <title>AI CI/CD 展示 · add() 操作台</title>
   <style>
     :root {
       --bg: #0b1020;
@@ -37,17 +37,68 @@
       line-height: 1.5;
       color: var(--text);
       background:
-        radial-gradient(1200px 600px at 20% 0%, rgba(124, 92, 255, 0.35), transparent 55%),
-        radial-gradient(900px 500px at 80% 20%, rgba(25, 211, 255, 0.28), transparent 60%),
+        radial-gradient(1200px 600px at 20% 0%, rgba(124, 92, 255, 0.38), transparent 55%),
+        radial-gradient(900px 500px at 80% 20%, rgba(25, 211, 255, 0.30), transparent 60%),
         radial-gradient(900px 600px at 60% 110%, rgba(29, 209, 161, 0.18), transparent 60%),
+        linear-gradient(180deg, rgba(0, 0, 0, 0.0), rgba(0, 0, 0, 0.18)),
         var(--bg);
       min-height: 100vh;
       display: grid;
       place-items: center;
       padding: 28px 16px 48px;
+      position: relative;
+      overflow-x: hidden;
+    }
+    /* Tech background: subtle grid + scan + particles (CSS-only) */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.55;
+      background:
+        linear-gradient(to right, rgba(255, 255, 255, 0.06) 1px, transparent 1px) 0 0 / 56px 56px,
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.045) 1px, transparent 1px) 0 0 / 56px 56px;
+      mask-image: radial-gradient(700px 480px at 20% 20%, black 40%, transparent 72%);
+    }
+    body::after {
+      content: "";
+      position: fixed;
+      inset: -20%;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 15% 30%, rgba(25, 211, 255, 0.18), transparent 45%),
+        radial-gradient(circle at 80% 20%, rgba(124, 92, 255, 0.22), transparent 45%),
+        radial-gradient(circle at 60% 85%, rgba(29, 209, 161, 0.14), transparent 48%),
+        repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.03) 0 1px, transparent 1px 10px);
+      filter: blur(0.2px);
+      animation: drift 14s linear infinite;
+      opacity: 0.55;
+    }
+    @keyframes drift {
+      0% { transform: translate3d(0, 0, 0); }
+      100% { transform: translate3d(-2.5%, 1.5%, 0); }
+    }
+    .scan {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background: linear-gradient(180deg, transparent, rgba(25, 211, 255, 0.08), transparent);
+      height: 220px;
+      transform: translateY(-240px);
+      animation: scan 7.5s ease-in-out infinite;
+      mix-blend-mode: screen;
+      opacity: 0.55;
+    }
+    @keyframes scan {
+      0% { transform: translateY(-240px); }
+      55% { transform: translateY(calc(100vh + 240px)); }
+      100% { transform: translateY(calc(100vh + 240px)); }
     }
     .app {
       width: min(980px, 100%);
+      position: relative;
+      z-index: 1;
     }
     .topbar {
       display: flex;
@@ -307,33 +358,34 @@
   </style>
 </head>
 <body>
+  <div class="scan" aria-hidden="true"></div>
   <div class="app">
     <div class="topbar">
       <div class="brand">
         <div class="logo" aria-hidden="true"></div>
         <div>
-          <h1>AI CI/CD Demo · add() Playground</h1>
-          <div class="subtitle">A simple page deployed via GitHub Pages after CI passes.</div>
+          <h1>AI CI/CD 展示 · add() 操作台</h1>
+          <div class="subtitle">CI 通過後自動部署到 GitHub Pages 的靜態頁面。</div>
         </div>
       </div>
       <div class="actions">
-        <div class="pill" title="Current core behavior">
-          <span>core <strong>add(a,b)</strong> =</span>
-          <span class="badge">multiply</span>
+        <div class="pill" title="目前核心行為">
+          <span>核心 <strong>add(a,b)</strong> =</span>
+          <span class="badge">乘法</span>
         </div>
-        <div class="pill" title="Toggle theme">
-          <span>Theme</span>
-          <input id="themeToggle" class="toggle" type="checkbox" role="switch" aria-label="Toggle theme">
+        <div class="pill" title="切換主題">
+          <span>主題</span>
+          <input id="themeToggle" class="toggle" type="checkbox" role="switch" aria-label="切換深淺色主題">
         </div>
       </div>
     </div>
 
     <div class="grid">
       <section class="card" aria-labelledby="coreDemoTitle">
-        <h2 id="coreDemoTitle">Core behavior demo</h2>
+        <h2 id="coreDemoTitle">核心行為展示</h2>
         <p>
-          This section mimics the current repo logic: <code>add(a, b)</code> returns <strong>a × b</strong>.
-          Try changing values and press <span class="kbd">Enter</span>.
+          這裡用 JavaScript 模擬目前 repo 的邏輯：<code>add(a, b)</code> 回傳 <strong>a × b</strong>。
+          你可以改數字後按 <span class="kbd">Enter</span>。
         </p>
 
         <div class="row">
@@ -347,27 +399,27 @@
           </div>
         </div>
 
-        <button id="btnCore" type="button">Run core add()</button>
+        <button id="btnCore" type="button">執行核心 add()</button>
         <div id="result" aria-live="polite"></div>
         <div id="coreError" class="error" style="display:none" aria-live="polite"></div>
         <div class="small">
-          Tip: you can also press <span class="kbd">Enter</span> to run, and <span class="kbd">Esc</span> to clear.
+          小技巧：按 <span class="kbd">Enter</span> 可執行；按 <span class="kbd">Esc</span> 可清除訊息。
         </div>
       </section>
 
       <section class="card" aria-labelledby="toolTitle">
-        <h2 id="toolTitle">Extra tool (not tied to core)</h2>
+        <h2 id="toolTitle">進階工具（與核心邏輯無關）</h2>
         <p>
-          For a richer UI, here’s a small calculator with operator selection and a history panel.
-          This is just a frontend utility; it won’t affect your Python logic.
+          為了讓介面更完整，這裡提供可選運算與歷史紀錄的小工具。
+          這只是前端功能，不會影響你的 Python 邏輯。
         </p>
 
-        <label for="op">Operation</label>
+        <label for="op">運算</label>
         <select id="op" name="op">
-          <option value="add">Add (A + B)</option>
-          <option value="sub">Subtract (A − B)</option>
-          <option value="mul">Multiply (A × B)</option>
-          <option value="div">Divide (A ÷ B)</option>
+          <option value="add">加法 (A + B)</option>
+          <option value="sub">減法 (A − B)</option>
+          <option value="mul">乘法 (A × B)</option>
+          <option value="div">除法 (A ÷ B)</option>
         </select>
 
         <div class="row">
@@ -381,13 +433,13 @@
           </div>
         </div>
 
-        <button id="btnCalc" type="button">Calculate</button>
-        <button id="btnClear" class="secondary" type="button">Clear history</button>
+        <button id="btnCalc" type="button">計算</button>
+        <button id="btnClear" class="secondary" type="button">清除歷史</button>
         <div id="calcError" class="error" style="display:none" aria-live="polite"></div>
 
         <div class="history">
-          <h3>History</h3>
-          <ul id="historyList" class="historyList" aria-label="Calculation history"></ul>
+          <h3>歷史紀錄</h3>
+          <ul id="historyList" class="historyList" aria-label="計算歷史紀錄"></ul>
         </div>
       </section>
     </div>
@@ -417,12 +469,12 @@
 
       if (Number.isNaN(result)) {
         setVisible(err, true);
-        err.textContent = "Please enter valid numbers for A and B.";
+        err.textContent = "請輸入有效的 A、B 數值。";
         container.textContent = "";
         return;
       }
       setVisible(err, false);
-      container.textContent = `Result: ${result}`;
+      container.textContent = `結果：${result}`;
     }
 
     // ---- Extra calculator tool ----
@@ -475,12 +527,12 @@
 
       if (Number.isNaN(a) || Number.isNaN(b)) {
         setVisible(err, true);
-        err.textContent = "Please enter valid numbers for A and B.";
+        err.textContent = "請輸入有效的 A、B 數值。";
         return;
       }
       if (op === "div" && b === 0) {
         setVisible(err, true);
-        err.textContent = "Division by zero is not allowed.";
+        err.textContent = "不可除以 0。";
         return;
       }
 
@@ -522,7 +574,7 @@
 
     document.addEventListener("keydown", (e) => {
       if (e.key === "Enter") {
-        // run the core demo by default; shift+enter runs calculator
+        // 預設執行核心展示；Shift+Enter 執行進階計算器
         if (e.shiftKey) runCalc();
         else runCore();
       }
